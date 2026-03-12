@@ -1,12 +1,10 @@
-// Day 10 — Typing Speed Test
+
 // Concepts used: setInterval, clearInterval, event listeners, string comparison
 
 // Sample texts (short list; add more as desired)
 const SAMPLES = [
-  "The quick brown fox jumps over the lazy dog.",
-  "Practice makes progress. Keep typing to improve your speed and accuracy.",
-  "Web development combines creativity with logic — build small projects every day.",
-  "Typing fast is great, but typing accurately will get you further in the long run."
+  "Two competing software companies AlphaTech and Beta Solutions, were constantly vying for market share.After years of rivalry, their CEOs, Mark and Lisa, found themselves seated next to each other on a long flight.They struck up a conversation, discovering shared frustrations with industry challenges.This chance encounter led to a groundbreaking partnership.By combining their strengths, AlphaTech and Beta Solutions developed a revolutionary product that captured 50 % of the market within a year, proving that sometimes, collaboration can be more powerful than competition.",
+  "Practice makes progress. Keep typing to improve your speed and accuracy.Web development combines creativity with logic — build small projects every day.Typing fast is great, but typing accurately will get you further in the long run."
 ];
 
 // DOM
@@ -42,15 +40,15 @@ let errors = 0;               // positions currently incorrect
 let lastInput = '';           // last input string
 
 // Initialize a test
-function pickSample(){
-  const idx = Math.floor(Math.random()*SAMPLES.length);
+function pickSample() {
+  const idx = Math.floor(Math.random() * SAMPLES.length);
   return SAMPLES[idx];
 }
 
-function renderReference(text){
+function renderReference(text) {
   reference = text;
   quoteEl.innerHTML = '';
-  for(let i=0;i<text.length;i++){
+  for (let i = 0; i < text.length; i++) {
     const span = document.createElement('span');
     span.className = 'char';
     span.textContent = text[i];
@@ -61,28 +59,28 @@ function renderReference(text){
 }
 
 // Highlight current index
-function highlightCurrent(pos){
+function highlightCurrent(pos) {
   const spans = quoteEl.querySelectorAll('.char');
   spans.forEach(sp => {
     sp.classList.remove('current');
   });
   const cur = quoteEl.querySelector(`.char[data-index="${pos}"]`);
-  if(cur) cur.classList.add('current');
+  if (cur) cur.classList.add('current');
 }
 
 // Reset stats & UI
-function resetTest(autoFocus=true){
+function resetTest(autoFocus = true) {
   clearInterval(timer);
   timer = null;
   started = false;
-  duration = parseInt(durationSelect.value,10) || 60;
+  duration = parseInt(durationSelect.value, 10) || 60;
   remaining = duration;
   startTime = 0;
   typedChars = 0;
   correctChars = 0;
   errors = 0;
   lastInput = '';
-  updateStatsDisplay(0,0,100,0);
+  updateStatsDisplay(0, 0, 100, 0);
   timeEl.textContent = formatTime(remaining);
   inputEl.value = '';
   finalPanel.classList.add('hidden');
@@ -90,24 +88,24 @@ function resetTest(autoFocus=true){
   // new sample
   renderReference(pickSample());
   inputEl.disabled = false;
-  if(autoFocus) inputEl.focus();
+  if (autoFocus) inputEl.focus();
 }
 
 // Format seconds -> mm:ss
-function formatTime(sec){
+function formatTime(sec) {
   const s = Math.max(0, Math.floor(sec));
   const mm = Math.floor(s / 60);
   const ss = s % 60;
-  return String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+  return String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
 }
 
 // Start timer
-function startTest(){
-  if(started) return;
+function startTest() {
+  if (started) return;
   started = true;
   startTime = Date.now();
   // ensure duration updated from selector (in case changed)
-  duration = parseInt(durationSelect.value,10) || 60;
+  duration = parseInt(durationSelect.value, 10) || 60;
   remaining = duration;
   timeEl.textContent = formatTime(remaining);
   timer = setInterval(() => {
@@ -117,22 +115,22 @@ function startTest(){
     timeEl.textContent = formatTime(rem);
     // update live WPM/accuracy each tick
     updateLiveStats();
-    if(rem <= 0){
+    if (rem <= 0) {
       endTest();
     }
   }, 100); // 100ms tick gives responsive UI without heavy CPU
 }
 
 // End test
-function endTest(){
+function endTest() {
   clearInterval(timer);
   timer = null;
   started = false;
   inputEl.disabled = true;
   // final stats
-  const minutes = (duration - remaining) / 60 || (duration/60);
-  const finalWPM = Math.round( (correctChars / 5) / ( (duration - remaining) / 60 || (duration/60) ) ) || 0;
-  const finalCPM = Math.round( (correctChars) / ( (duration - remaining) / 60 || (duration/60) ) ) || 0;
+  const minutes = (duration - remaining) / 60 || (duration / 60);
+  const finalWPM = Math.round((correctChars / 5) / ((duration - remaining) / 60 || (duration / 60))) || 0;
+  const finalCPM = Math.round((correctChars) / ((duration - remaining) / 60 || (duration / 60))) || 0;
   const acc = typedChars > 0 ? Math.round((correctChars / typedChars) * 100) : 100;
 
   finalWpm.textContent = finalWPM;
@@ -148,18 +146,18 @@ function endTest(){
 }
 
 // Compute and display live stats
-function updateLiveStats(){
+function updateLiveStats() {
   // elapsed = duration - remaining
   const elapsedSeconds = Math.max(0, duration - remaining);
-  const minutes = Math.max( (elapsedSeconds / 60), 1/60 ); // avoid division by zero early
-  const liveWPM = Math.round( (correctChars / 5) / minutes ) || 0;
-  const liveCPM = Math.round( correctChars / minutes ) || 0;
+  const minutes = Math.max((elapsedSeconds / 60), 1 / 60); // avoid division by zero early
+  const liveWPM = Math.round((correctChars / 5) / minutes) || 0;
+  const liveCPM = Math.round(correctChars / minutes) || 0;
   const acc = typedChars > 0 ? Math.round((correctChars / typedChars) * 100) : 100;
   updateStatsDisplay(liveWPM, liveCPM, acc, errors);
 }
 
 // Update stats UI
-function updateStatsDisplay(wpm, cpm, acc, err){
+function updateStatsDisplay(wpm, cpm, acc, err) {
   wpmEl.textContent = wpm;
   cpmEl.textContent = cpm;
   accuracyEl.textContent = acc + '%';
@@ -170,7 +168,7 @@ function updateStatsDisplay(wpm, cpm, acc, err){
 inputEl.addEventListener('input', (e) => {
   const value = inputEl.value;
   // Auto-start on first real input
-  if(!started && value.length > 0){
+  if (!started && value.length > 0) {
     startTest();
   }
 
@@ -179,7 +177,7 @@ inputEl.addEventListener('input', (e) => {
   // so we track previous value length and difference.
   // A simple approach: increment typedChars by the number of characters added since last input.
   // If user deleted (new length < last length), we won't increment typedChars.
-  if(value.length > lastInput.length){
+  if (value.length > lastInput.length) {
     typedChars += (value.length - lastInput.length);
   }
   lastInput = value;
@@ -188,13 +186,13 @@ inputEl.addEventListener('input', (e) => {
   correctChars = 0;
   errors = 0;
   const spans = quoteEl.querySelectorAll('.char');
-  for(let i=0;i<spans.length;i++){
+  for (let i = 0; i < spans.length; i++) {
     const ch = spans[i].textContent;
     const typed = value[i];
-    spans[i].classList.remove('correct','incorrect','current');
-    if(typed == null || typed === ''){
+    spans[i].classList.remove('correct', 'incorrect', 'current');
+    if (typed == null || typed === '') {
       // not typed yet
-    } else if(typed === ch){
+    } else if (typed === ch) {
       spans[i].classList.add('correct');
       correctChars++;
     } else {
@@ -203,7 +201,7 @@ inputEl.addEventListener('input', (e) => {
     }
   }
   // if user typed beyond length, count those as errors but do not render spans
-  if(value.length > reference.length){
+  if (value.length > reference.length) {
     // extra chars typed
     const extra = value.length - reference.length;
     errors += extra;
@@ -220,7 +218,7 @@ inputEl.addEventListener('input', (e) => {
 
 // Start / Restart / Try Again handlers
 startBtn.addEventListener('click', () => {
-  if(!started){
+  if (!started) {
     inputEl.focus();
     // If no typing yet, start immediately and don't clear typed input
     startTest();
@@ -240,7 +238,7 @@ resetTest(true);
 
 // Optional: allow pressing Escape to reset quickly
 document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape'){
+  if (e.key === 'Escape') {
     resetTest(true);
   }
 });
