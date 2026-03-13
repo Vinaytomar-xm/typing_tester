@@ -1,69 +1,150 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Typing Speed Test</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TypeForge — Typing Speed Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="card" role="main" aria-labelledby="title">
-    <header>
-      <div class="logo">TS</div>
-      <div>
-        <h1 id="title">Typing Speed Test</h1>
-        <p class="lead">Measure typing speed (WPM) and accuracy. Start typing or press Start to begin the timer.</p>
+  <!-- Top progress bar -->
+  <div class="progress-track" aria-hidden="true">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <main class="container" role="main">
+
+    <!-- ── Header ── -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">⌨</div>
+        <div>
+          <div class="brand-name">TypeForge</div>
+          <div class="brand-sub">measure · improve · forge</div>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- Mode -->
+        <div class="pill-group" role="tablist" aria-label="Test mode">
+          <button class="pill active" data-mode="words" role="tab" aria-selected="true">words</button>
+          <button class="pill" data-mode="quotes" role="tab" aria-selected="false">quotes</button>
+        </div>
+
+        <!-- Duration -->
+        <div class="pill-group" role="group" aria-label="Duration">
+          <button class="pill" data-dur="15">15s</button>
+          <button class="pill" data-dur="30">30s</button>
+          <button class="pill active" data-dur="60">60s</button>
+          <button class="pill" data-dur="120">120s</button>
+        </div>
       </div>
     </header>
 
-    <section class="controls">
-      <div class="left">
-        <label class="small">Duration:
-          <select id="duration">
-            <option value="15">15s</option>
-            <option value="30">30s</option>
-            <option value="60" selected>60s</option>
-            <option value="120">120s</option>
-          </select>
-        </label>
+    <!-- ── Live stats ── -->
+    <div class="stats-bar" aria-live="polite" aria-atomic="false">
+      <div class="stat">
+        <div class="stat-num" id="statWpm">0</div>
+        <div class="stat-lbl">wpm</div>
+      </div>
+      <div class="stat stat-center">
+        <div class="stat-num accent-text" id="statTime">60</div>
+        <div class="stat-lbl">sec left</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statAcc">—</div>
+        <div class="stat-lbl">accuracy</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="statErrors">0</div>
+        <div class="stat-lbl">errors</div>
+      </div>
+    </div>
 
-        <button id="startBtn" class="btn">Start</button>
-        <button id="restartBtn" class="btn secondary">Restart</button>
+    <!-- ── Typing area ── -->
+    <section class="typing-section" id="typingSection" aria-label="Typing test">
+      <!-- Word display -->
+      <div class="words-outer" id="wordsOuter">
+        <div class="words-inner" id="wordsInner">
+          <div class="words" id="words" aria-hidden="true"></div>
+        </div>
+        <div class="caret" id="caret" aria-hidden="true"></div>
+        <!-- Blur overlay on top/bottom edges -->
+        <div class="fade-top" aria-hidden="true"></div>
+        <div class="fade-bottom" aria-hidden="true"></div>
       </div>
 
-      <div class="stats" aria-live="polite">
-        <div class="stat"><div class="label">Time</div><div id="time" class="value">00:00</div></div>
-        <div class="stat"><div class="label">WPM</div><div id="wpm" class="value">0</div></div>
-        <div class="stat"><div class="label">CPM</div><div id="cpm" class="value">0</div></div>
-        <div class="stat"><div class="label">Accuracy</div><div id="accuracy" class="value">100%</div></div>
-        <div class="stat"><div class="label">Errors</div><div id="errors" class="value">0</div></div>
+      <!-- Hidden real input -->
+      <input
+        type="text"
+        id="typingInput"
+        class="typing-input"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        aria-label="Type here to start the test"
+        tabindex="0"
+      />
+
+      <!-- Hint overlay (before test starts) -->
+      <div class="typing-hint" id="typingHint">
+        <span>click or start typing to begin</span>
+        <span class="hint-sep">·</span>
+        <kbd>tab</kbd> to restart
       </div>
     </section>
 
-    <section class="test-area">
-      <div id="quote" class="quote" aria-hidden="false"></div>
-
-      <label for="input" class="sr-only">Typing input</label>
-      <textarea id="input" placeholder="Start typing here..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-
-      <div class="hint muted">Tip: Backspace is allowed — accuracy is calculated based on typed characters vs correct characters.</div>
-    </section>
-
-    <section id="final" class="final hidden" role="status" aria-live="polite">
-      <h3>Results</h3>
-      <div class="final-grid">
-        <div><strong>WPM</strong><div id="finalWpm" class="big">0</div></div>
-        <div><strong>Accuracy</strong><div id="finalAcc" class="big">0%</div></div>
-        <div><strong>CPM</strong><div id="finalCpm" class="big">0</div></div>
-        <div><strong>Errors</strong><div id="finalErr" class="big">0</div></div>
+    <!-- ── Results panel ── -->
+    <section class="results hidden" id="results" role="status" aria-live="polite">
+      <div class="results-headline">
+        <div class="results-label">your speed</div>
+        <div class="results-wpm">
+          <span id="resultWpm">0</span>
+          <span class="results-unit">wpm</span>
+        </div>
       </div>
-      <button id="tryAgain" class="btn">Try again</button>
+
+      <div class="results-grid">
+        <div class="res-card">
+          <div class="res-val" id="resultAcc">—</div>
+          <div class="res-lbl">accuracy</div>
+        </div>
+        <div class="res-card">
+          <div class="res-val" id="resultCpm">0</div>
+          <div class="res-lbl">cpm</div>
+        </div>
+        <div class="res-card">
+          <div class="res-val" id="resultErrors">0</div>
+          <div class="res-lbl">errors</div>
+        </div>
+        <div class="res-card highlight">
+          <div class="res-val" id="resultBest">—</div>
+          <div class="res-lbl">best wpm</div>
+        </div>
+      </div>
+
+      <!-- Mini WPM chart -->
+      <canvas id="wpmChart" class="wpm-chart" width="600" height="80" aria-label="WPM over time chart"></canvas>
+
+      <div class="results-actions">
+        <button class="btn-primary" id="tryAgainBtn">try again</button>
+        <button class="btn-ghost" id="newTestBtn">new test</button>
+      </div>
     </section>
 
-    <details style="margin-top:14px">
-      <summary>How it works (short)</summary>
-      <p class="small">The script renders a sample text as individual character spans. As the user types, each input char is compared against the reference char at the same position and receives a class: correct / incorrect / pending. A countdown timer runs for the chosen duration. WPM = (correctChars / 5) / minutes; accuracy = (correctChars / typedChars) * 100. Results shown when time ends.</p>
-    </details>
+    <!-- ── Footer ── -->
+    <footer class="footer">
+      <span class="footer-brand">TypeForge v2.0</span>
+      <span>·</span>
+      <span><kbd>tab</kbd> / <kbd>esc</kbd> restart</span>
+      <span>·</span>
+      <span>backspace allowed within word</span>
+    </footer>
+
   </main>
 
   <script src="script.js"></script>
